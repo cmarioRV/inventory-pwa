@@ -65,12 +65,11 @@ async function loadItems() {
   const itemsSnap = await getDocs(collection(db, "Goods"));
   itemsSnap.forEach((doc) => {
     const data = doc.data();
-    if (data.isActive === false) return;
-    itemsCache.push({ id: doc.id, name: data.name, unit: data.unit });
+    itemsCache.push({ id: doc.id, name: data.name, unit: data.measure_unit.abbreviation });
 
     const opt = document.createElement("option");
     opt.value = doc.id;
-    opt.textContent = `${data.name} (${data.unit})`;
+    opt.textContent = `${data.name} (${data.measure_unit.abbreviation})`;
     itemSelect.appendChild(opt);
   });
 }
@@ -90,7 +89,7 @@ saveMovementBtn.addEventListener("click", async () => {
   if (!item) return alert("Ítem no encontrado");
 
   await addDoc(collection(db, "Movements"), {
-    storeId: "main",
+    storeId: "1",
     itemId,
     type,
     qty,
@@ -116,7 +115,7 @@ async function refreshStock() {
 
   // Trae todos los movimientos (MVP). Luego filtramos por fechas/paginación si crece.
   const movSnap = await getDocs(
-    query(collection(db, "Movements"), where("storeId", "==", "main"))
+    query(collection(db, "Movements"), where("storeId", "==", "1"))
   );
 
   movSnap.forEach((doc) => {
